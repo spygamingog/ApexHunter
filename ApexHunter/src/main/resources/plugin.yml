@@ -1,0 +1,23 @@
+name: ApexHunter
+version: 1.0.0
+main: com.spygamingog.apexhunter.ApexHunterPlugin
+api-version: '1.21'
+authors:
+  - SpyGamingOG
+commands:
+  manhunt:
+    description: Manhunt GUI and lobby management
+    usage: /manhunt [lobby|stop]
+    aliases: [mh]
+  manhuntlobby:
+    description: Teleport to the main manhunt lobby or set it
+    usage: /manhuntlobby [set]
+    aliases: [mhl]
+  manhuntleave:
+    description: Leave to the main manhunt lobby
+    usage: /manhuntleave
+    aliases: [leave]
+  manhuntrejoin:
+    description: Rejoin your active manhunt world
+    usage: /manhuntrejoin
+    aliases: [rejoin]

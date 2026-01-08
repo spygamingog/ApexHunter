@@ -1,0 +1,30 @@
+slots:
+  1v1:
+    minPlayers: 2
+    maxPlayers: 2
+    worlds:
+      overworld: "1v1_manhunt"
+      nether: "1v1_manhunt_nether"
+      the_end: "1v1_manhunt_the_end"
+  1v2:
+    minPlayers: 3
+    maxPlayers: 3
+    worlds:
+      overworld: "1v2_manhunt"
+      nether: "1v2_manhunt_nether"
+      the_end: "1v2_manhunt_the_end"
+  2v4:
+    minPlayers: 6
+    maxPlayers: 6
+    worlds:
+      overworld: "2v4_manhunt"
+      nether: "2v4_manhunt_nether"
+      the_end: "2v4_manhunt_the_end"
+main_lobby:
+  world: ""
+  x: 0.0
+  y: 64.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+countdown_seconds: 30
