@@ -1,7 +1,7 @@
 # ApexHunter 🎯
 
 [![Modrinth](https://img.shields.io/modrinth/v/apexhunter?label=Modrinth&logo=modrinth&color=green)](https://modrinth.com/plugin/apexhunter)
-[![GitHub Release](https://img.shields.io/github/v/release/yourusername/ApexHunter)](https://github.com/spygamingog/ApexHunter/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/spygamingog/ApexHunter)](https://github.com/spygamingog/ApexHunter/releases)
 ![License](https://img.shields.io/github/license/spygamingog/ApexHunter)
 ![Java](https://img.shields.io/badge/Java-21%2B-orange)
 ![Paper](https://img.shields.io/badge/Paper-1.21.11%2B-blue)
