@@ -1,8 +1,8 @@
-# ApexHunter 🎯
+# SpyHunts 🎯
 
-[![Modrinth](https://img.shields.io/modrinth/v/apexhunter?label=Modrinth&logo=modrinth&color=green)](https://modrinth.com/plugin/apexhunter)
-[![GitHub Release](https://img.shields.io/github/v/release/spygamingog/ApexHunter)](https://github.com/spygamingog/ApexHunter/releases)
-![License](https://img.shields.io/github/license/spygamingog/ApexHunter)
+[![Modrinth](https://img.shields.io/modrinth/v/spyhunts?label=Modrinth&logo=modrinth&color=green)](https://modrinth.com/plugin/spyhunts)
+[![GitHub Release](https://img.shields.io/github/v/release/spygamingog/SpyHunts)](https://github.com/spygamingog/SpyHunts/releases)
+![License](https://img.shields.io/github/license/spygamingog/SpyHunts)
 ![Java](https://img.shields.io/badge/Java-21%2B-orange)
 ![Paper](https://img.shields.io/badge/Paper-1.21.11%2B-blue)
 
@@ -42,8 +42,8 @@ A professional manhunt plugin for Paper servers featuring automated queues, GUI 
 ## 🚀 Quick Start
 
 ### Installation
-1. Download the latest jar from [Modrinth](https://modrinth.com/plugin/apexhunter) or [GitHub Releases](https://github.com/spygamingog/ApexHunter/releases)
-2. Place `ApexHunter.jar` in your server's `plugins/` folder
+1. Download the latest jar from [Modrinth](https://modrinth.com/plugin/spyhunts) or [GitHub Releases](https://github.com/spygamingog/SpyHunts/releases)
+2. Place `SpyHunts.jar` in your server's `plugins/` folder
 3. Restart your server
 4. Configure as needed (see Configuration below)
 
@@ -63,19 +63,19 @@ A professional manhunt plugin for Paper servers featuring automated queues, GUI 
 ### Player Commands
 | Command | Description | Permission |
 |---------|-------------|------------|
-| `/manhunt` | Open the Manhunt GUI | `apexhunter.use` |
-| `/manhuntlobby` | Teleport to main manhunt lobby | `apexhunter.use` |
-| `/manhuntleave` | Leave active match temporarily | `apexhunter.use` |
-| `/manhuntrejoin` | Rejoin your active match | `apexhunter.use` |
+| `/manhunt` | Open the Manhunt GUI | `spyhunts.use` |
+| `/manhuntlobby` | Teleport to main manhunt lobby | `spyhunts.use` |
+| `/manhuntleave` | Leave active match temporarily | `spyhunts.use` |
+| `/manhuntrejoin` | Rejoin your active match | `spyhunts.use` |
 
 ### Admin Commands
 | Command | Description | Permission |
 |---------|-------------|------------|
-| `/manhunt lobby create` | Create and assign a new lobby | `apexhunter.lobby` |
-| `/manhunt lobby list` | List all available lobbies | `apexhunter.lobby` |
-| `/manhunt lobby remove <name>` | Remove a lobby | `apexhunter.lobby` |
-| `/manhunt stop` | Stop an active match | `apexhunter.admin` |
-| `/manhuntlobby set` | Set the main lobby location | `apexhunter.admin` |
+| `/manhunt lobby create` | Create and assign a new lobby | `spyhunts.lobby` |
+| `/manhunt lobby list` | List all available lobbies | `spyhunts.lobby` |
+| `/manhunt lobby remove <name>` | Remove a lobby | `spyhunts.lobby` |
+| `/manhunt stop` | Stop an active match | `spyhunts.admin` |
+| `/manhuntlobby set` | Set the main lobby location | `spyhunts.admin` |
 
 ## ⚙️ Configuration
 
@@ -135,8 +135,8 @@ This project is licensed under the **MPL-2.0 License**.
 
 ## 📞 Support
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/spygamingog/ApexHunter/issues)
-- **Modrinth**: [Download and rate](https://modrinth.com/plugin/apexhunter)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/spygamingog/SpyHunts/issues)
+- **Modrinth**: [Download and rate](https://modrinth.com/plugin/spyhunts)
 - **Discord**: [Join our community](https://discord.gg/fzcGYV7E9Q) (Optional)
 
 ## 🙏 Acknowledgements
