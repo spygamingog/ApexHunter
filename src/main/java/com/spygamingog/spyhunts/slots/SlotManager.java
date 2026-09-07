@@ -98,6 +98,7 @@ public class SlotManager {
                         slot.setStatus(SlotStatus.UNAVAILABLE);
                     }
                     slot.setHasEverRun(plugin.getSlotDataManager().getSlotHasEverRun(modeId, slotId, typeName));
+                    slot.setGrindPhase(plugin.getSlotDataManager().isSlotGrindPhase(modeId, slotId, typeName));
                     mode.addSlot(slotId, slot);
                 }
                 modes.put(gameType.name() + ":" + modeId, mode);
@@ -107,6 +108,7 @@ public class SlotManager {
 
     public void saveSlotStatus(ManhuntSlot slot) {
         plugin.getSlotDataManager().setSlotStatus(slot.getModeId(), slot.getSlotId(), slot.getGameType().name(), slot.getStatus().name());
+        plugin.getSlotDataManager().setSlotGrindPhase(slot.getModeId(), slot.getSlotId(), slot.getGameType().name(), slot.isGrindPhase());
     }
 
     public List<ManhuntMode> getAllModes() {
@@ -122,6 +124,13 @@ public class SlotManager {
     public void addMode(String modeId, int min, int max, GameType gameType) {
         String key = gameType.name() + ":" + modeId;
         if (modes.containsKey(key)) return;
+        if (gameType == GameType.DEATHSWAP) {
+            try {
+                int count = Integer.parseInt(modeId);
+                min = count;
+                max = count;
+            } catch (Exception ignored) {}
+        }
         ManhuntMode mode = new ManhuntMode(modeId, min, max, gameType);
         modes.put(key, mode);
         plugin.getSlotDataManager().setModeConfig(modeId, gameType.name(), min, max);
@@ -229,7 +238,11 @@ public class SlotManager {
         leaveAnyQueue(player);
         slot.addToQueue(player);
         plugin.getLogger().info("[DEBUG] Player " + player.getName() + " joined queue for " + slot.getFullId() + ". New size: " + slot.getQueueSize() + ", Status: " + slot.getStatus());
-        player.sendMessage("§aJoined queue for " + modeId + " (" + slotId + ")");
+        if (slot.getGameType() == GameType.DEATHSWAP) {
+            player.sendMessage("§aJoined queue for " + modeId + " Player DeathSwap (" + slotId + ")");
+        } else {
+            player.sendMessage("§aJoined queue for " + modeId + " (" + slotId + ")");
+        }
         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_CHICKEN_EGG, 1.0f, 1.5f);
         
         // Broadcast to players already in the queue
@@ -307,7 +320,10 @@ public class SlotManager {
             Player p = Bukkit.getPlayer(uuid);
             if (p != null) {
                 if (seconds == 30) {
-                    p.sendMessage("§e§lManhunt will start in §f30 seconds.");
+                    String gameName = "Manhunt";
+                    if (slot.getGameType() == GameType.SPEEDRUN) gameName = "Speedrun";
+                    else if (slot.getGameType() == GameType.DEATHSWAP) gameName = "DeathSwap";
+                    p.sendMessage("§e§l" + gameName + " will start in §f30 seconds.");
                     try {
                         p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
                     } catch (Throwable ignored) {}
@@ -355,6 +371,31 @@ public class SlotManager {
             slot.startGameTimer(tick -> {}, () -> {
                 endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
             });
+            if (slot.getGameType() == GameType.DEATHSWAP && plugin.getDeathSwapManager() != null) {
+                plugin.getDeathSwapManager().resumeGame(slot);
+            }
+            return;
+        }
+
+        // Resume DeathSwap Grind Phase if server restarted during it
+        if (slot.getGameType() == GameType.DEATHSWAP && slot.isGrindPhase()) {
+            slot.startWaitTimer(slot.getWaitSeconds() > 0 ? slot.getWaitSeconds() : 300, () -> {
+                slot.setGrindPhase(false);
+                saveSlotStatus(slot);
+                for (UUID uuid : slot.getActivePlayers()) {
+                    Player p = Bukkit.getPlayer(uuid);
+                    if (p != null) {
+                        p.sendTitle("§c§lDEATHSWAP STARTED!", "§fSwaps enabled!", 10, 40, 10);
+                        p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f);
+                    }
+                }
+                slot.startGameTimer(tick -> {}, () -> {
+                    endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
+                });
+                if (plugin.getDeathSwapManager() != null) {
+                    plugin.getDeathSwapManager().startGame(slot);
+                }
+            });
             return;
         }
 
@@ -362,20 +403,55 @@ public class SlotManager {
             slot.startGameTimer(tick -> {}, () -> {
                 endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
             });
+            if (slot.getGameType() == GameType.DEATHSWAP && plugin.getDeathSwapManager() != null) {
+                plugin.getDeathSwapManager().startGame(slot);
+            }
         } else {
-            slot.startWaitTimer(120, () -> {
-                // When wait timer ends, send title and start game timer
+            if (slot.getGameType() == GameType.DEATHSWAP) {
+                // DEATHSWAP: 5-Minute Grind Period
                 for (UUID uuid : slot.getActivePlayers()) {
                     Player p = Bukkit.getPlayer(uuid);
                     if (p != null) {
-                        p.sendTitle("§a§lGO!", "§fThe hunt has begun!", 10, 40, 10);
-                        p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+                        p.sendTitle("§6§lGRIND TIME!", "§e5 Minutes to gather resources!", 10, 60, 10);
+                        p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                        p.sendMessage("§e§lGrind Time! §7PvP is disabled. Gather resources for 5 minutes before swaps begin.");
                     }
                 }
-                slot.startGameTimer(tick -> {}, () -> {
-                    endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
+
+                slot.setGrindPhase(true);
+                saveSlotStatus(slot);
+                slot.startWaitTimer(300, () -> {
+                    slot.setGrindPhase(false);
+                    saveSlotStatus(slot);
+                    for (UUID uuid : slot.getActivePlayers()) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        if (p != null) {
+                            p.sendTitle("§c§lDEATHSWAP STARTED!", "§fSwaps enabled!", 10, 40, 10);
+                            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f);
+                        }
+                    }
+                    slot.startGameTimer(tick -> {}, () -> {
+                        endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
+                    });
+                    if (plugin.getDeathSwapManager() != null) {
+                        plugin.getDeathSwapManager().startGame(slot);
+                    }
                 });
-            });
+            } else {
+                slot.startWaitTimer(120, () -> {
+                    // When wait timer ends, send title and start game timer
+                    for (UUID uuid : slot.getActivePlayers()) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        if (p != null) {
+                            p.sendTitle("§a§lGO!", "§fThe hunt has begun!", 10, 40, 10);
+                            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+                        }
+                    }
+                    slot.startGameTimer(tick -> {}, () -> {
+                        endGameComplete(slot.getModeId(), slot.getSlotId(), slot.getGameType(), WinnerType.TIMEOUT);
+                    });
+                });
+            }
         }
     }
 
@@ -433,7 +509,7 @@ public class SlotManager {
                     World w = SpyAPI.getWorld(slot.getFullOverworldName());
                     if (w != null) {
                         p.teleport(w.getSpawnLocation());
-                        if (plugin.getFreezeManager() != null && !slot.isSkipTimer()) {
+                        if (plugin.getFreezeManager() != null && !slot.isSkipTimer() && slot.getGameType() != GameType.DEATHSWAP) {
                             plugin.getFreezeManager().freezePlayer(p, 120);
                         }
                     }
@@ -484,8 +560,8 @@ public class SlotManager {
         if (slot == null) return;
 
         slot.cancelCountdown();
-        // Stop the game timer explicitly
         slot.cancelGameTimer();
+        slot.cancelWaitTimer();
 
         Set<UUID> players = new HashSet<>(playerDataManager.getPlayersForSlot(modeId, slotId, type.name()));
         
@@ -596,6 +672,10 @@ public class SlotManager {
         
         slot.setStatus(SlotStatus.UNAVAILABLE);
         slot.setSkipTimer(false);
+        slot.setGrindPhase(false);
+        if (plugin.getDeathSwapManager() != null) {
+            plugin.getDeathSwapManager().stopGame(slot.getFullId());
+        }
         slot.clearQueue();
         saveSlotStatus(slot);
         playerDataManager.clearSlot(slot.getModeId(), slot.getSlotId(), slot.getGameType().name());
@@ -847,6 +927,13 @@ public class SlotManager {
     }
 
     private void assignRoles(ManhuntSlot slot) {
+        if (slot.getGameType() == GameType.DEATHSWAP) {
+            for (UUID uuid : slot.getQueuePlayers()) {
+                playerDataManager.setRole(slot.getModeId(), slot.getSlotId(), slot.getGameType(), uuid, "player");
+            }
+            return;
+        }
+
         List<UUID> players = new ArrayList<>(slot.getQueuePlayers());
         Collections.shuffle(players);
         
@@ -927,6 +1014,12 @@ public class SlotManager {
             w.setGameRule(GameRule.DO_WEATHER_CYCLE, true);
             w.setGameRule(GameRule.DO_MOB_SPAWNING, true);
             w.setFullTime(0);
+
+            if (slot != null && slot.getGameType() == GameType.DEATHSWAP) {
+                w.setPVP(false);
+            } else {
+                w.setPVP(true);
+            }
 
             // Set world borders
             if (w.getEnvironment() == World.Environment.NETHER) {

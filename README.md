@@ -76,6 +76,7 @@
 | `/manhunt` | `/mh` | Open the Manhunt mode & slot selection GUI |
 | `/speedrun` | — | Open the Speedrun race selection GUI |
 | `/practice` | — | Open the Practice mode selection GUI |
+| `/deathswap` | `/ds` | Open the DeathSwap mode & slot selection GUI |
 | `/leave` | — | Leave current queue and return to the main lobby |
 | `/rejoin` | — | Rejoin your active manhunt or speedrun match |
 | `/quit` | — | Forfeit current game and return to lobby (applies cooldown) |
@@ -96,6 +97,10 @@
 | `/manhunt skip start <mode> <slot>` | `manhunt.admin` / `spyhunts.admin` | Force-start immediately skipping warmup freeze |
 | `/manhunt cooldown <player> <sec>` | `manhunt.admin` / `spyhunts.admin` | Apply match cooldown to a player |
 | `/manhunt removecooldown <player>` | `manhunt.admin` / `spyhunts.admin` | Remove match cooldown from a player |
+| `/deathswap add mode <player_count>` | `deathswap.admin` / `spyhunts.admin` | Register a new DeathSwap mode |
+| `/deathswap add <mode> <slot>` | `deathswap.admin` / `spyhunts.admin` | Add an instance slot to DeathSwap mode |
+| `/deathswap remove <mode> [slot]` | `deathswap.admin` / `spyhunts.admin` | Remove an instance slot or entire mode |
+| `/deathswap stop <mode> <slot>` | `deathswap.admin` / `spyhunts.admin` | Force-terminate a DeathSwap match |
 | `/lobby set` | `manhunt.admin` / `spyhunts.admin` | Set main lobby spawn at current position |
 | `/lobby create` | `manhunt.admin` / `spyhunts.admin` | Create a new waiting lobby at current position |
 | `/lobby delete <name>` | `manhunt.admin` / `spyhunts.admin` | Delete a waiting lobby |
@@ -121,6 +126,7 @@
 | `manhunt.admin` | Administrative control over Manhunt games & lobbies | `op` |
 | `speedrun.admin` | Administrative control over Speedrun modes & slots | `op` |
 | `practice.admin` | Administrative control over Practice modes & slots | `op` |
+| `deathswap.admin` | Administrative control over DeathSwap modes & slots | `op` |
 | `manhunt.admin.build` | Bypass lobby build/break protection | `op` |
 | `manhunt.admin.fly` | Flight permission in lobby worlds | `op` |
 | `apexhunter.badge.admin` | Permission to give, set, and remove player titles | `op` |

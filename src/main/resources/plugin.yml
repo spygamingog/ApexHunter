@@ -52,6 +52,10 @@ commands:
     description: Manage leaderboard holograms
     usage: /leaderboard <create|delete|list>
     aliases: [lb, top]
+  deathswap:
+    description: DeathSwap management commands
+    usage: /deathswap
+    aliases: [ds]
 
 permissions:
   spyhunts.admin:
@@ -61,6 +65,7 @@ permissions:
       manhunt.admin: true
       speedrun.admin: true
       practice.admin: true
+      deathswap.admin: true
       apexhunter.admin: true
       apexhunter.badge.admin: true
       spyhunts.admin.stats: true

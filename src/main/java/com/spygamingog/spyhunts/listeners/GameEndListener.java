@@ -40,6 +40,11 @@ public class GameEndListener implements Listener {
         ManhuntSlot slot = slotManager.getSlot(modeId, slotId, type);
         if (slot == null) return;
 
+        if (type == GameType.DEATHSWAP) {
+            com.spygamingog.spyhunts.SpyHuntsPlugin.getInstance().getDeathSwapManager().onPlayerDeath(p);
+            return;
+        }
+
         String role = playerDataManager.getRole(modeId, slotId, type, p.getUniqueId());
         if (role != null && role.equalsIgnoreCase("speedrunner")) {
             // Stop timer on runner death
@@ -90,8 +95,8 @@ public class GameEndListener implements Listener {
         ManhuntSlot slot = slotManager.getSlot(modeId, slotId, type);
         if (slot == null) return;
 
-        // PvP is off in Speedrun mode
-        if (type == GameType.SPEEDRUN) {
+        // PvP is off in Speedrun and DeathSwap modes
+        if (type == GameType.SPEEDRUN || type == GameType.DEATHSWAP) {
             e.setCancelled(true);
         }
     }
@@ -135,6 +140,15 @@ public class GameEndListener implements Listener {
             if (overworld != null) {
                 e.setRespawnLocation(overworld.getSpawnLocation());
             }
+        }
+
+        if (type == GameType.DEATHSWAP) {
+            if (slot.isSpectator(p.getUniqueId()) || !slot.getActivePlayers().contains(p.getUniqueId())) {
+                Bukkit.getScheduler().runTask(com.spygamingog.spyhunts.SpyHuntsPlugin.getInstance(), () -> {
+                    p.setGameMode(org.bukkit.GameMode.SPECTATOR);
+                });
+            }
+            return;
         }
 
         String role = playerDataManager.getRole(modeId, slotId, type, p.getUniqueId());

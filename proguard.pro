@@ -18,6 +18,17 @@
 
 -keepclassmembers class * {
     @org.bukkit.event.EventHandler *;
+    public void run();
+    public boolean onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[]);
+    public java.util.List onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[]);
+}
+
+-keepclassmembers class * extends org.bukkit.scheduler.BukkitRunnable {
+    public void run();
+}
+
+-keepclassmembers class * implements java.lang.Runnable {
+    public void run();
 }
 
 -keep public class * implements org.bukkit.command.CommandExecutor {
@@ -32,3 +43,4 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+

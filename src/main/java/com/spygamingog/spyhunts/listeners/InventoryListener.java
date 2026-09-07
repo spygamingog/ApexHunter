@@ -138,6 +138,26 @@ public class InventoryListener implements Listener {
             return;
         }
 
+        if (title.equals("DeathSwap Selection")) {
+            event.setCancelled(true);
+            ItemStack item = event.getCurrentItem();
+            if (item == null || item.getType() == org.bukkit.Material.AIR) return;
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) return;
+            String name = ChatColor.stripColor(meta.getDisplayName());
+            
+            if (name.equals("Back")) {
+                p.closeInventory();
+                return;
+            }
+            
+            if (!name.startsWith("Mode: ")) return;
+            String modeId = name.substring(6);
+            
+            new ManhuntGUI(slotManager).openSlots(p, modeId, GameType.DEATHSWAP);
+            return;
+        }
+
         // Handle mode selection GUIs
         if (title.endsWith(" Solo") || title.endsWith(" Doubles")) {
             event.setCancelled(true);
@@ -197,11 +217,18 @@ public class InventoryListener implements Listener {
             } else if (title.startsWith("Slots Practice Speedrun: ")) {
                 type = GameType.PRACTICE_SPEEDRUN;
                 modeId = title.substring(25);
+            } else if (title.startsWith("Slots DeathSwap: ")) {
+                type = GameType.DEATHSWAP;
+                modeId = title.substring(17);
             } else return;
 
             if (name.equals("Back")) {
-                if (modeId.startsWith("1v")) new ManhuntGUI(slotManager).openSolo(p, type);
-                else new ManhuntGUI(slotManager).openDoubles(p, type);
+                if (type == GameType.DEATHSWAP) {
+                    new ManhuntGUI(slotManager).openDeathSwapMain(p);
+                } else {
+                    if (modeId.startsWith("1v")) new ManhuntGUI(slotManager).openSolo(p, type);
+                    else new ManhuntGUI(slotManager).openDoubles(p, type);
+                }
                 return;
             }
             

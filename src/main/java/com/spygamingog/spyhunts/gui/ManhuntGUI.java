@@ -189,12 +189,49 @@ public class ManhuntGUI {
         player.openInventory(inv);
     }
 
+    public void openDeathSwapMain(Player player) {
+        Inventory inv = Bukkit.createInventory(player, 54, "§8DeathSwap Selection");
+        fillGlass(inv);
+        int[] slots = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34};
+        int i = 0;
+        
+        List<ManhuntMode> modes = new ArrayList<>();
+        for (ManhuntMode mode : slotManager.getAllModes()) {
+            if (mode.getGameType() == GameType.DEATHSWAP) {
+                modes.add(mode);
+            }
+        }
+        modes.sort((a, b) -> {
+            try {
+                return Integer.compare(Integer.parseInt(a.getId()), Integer.parseInt(b.getId()));
+            } catch (Exception e) {
+                return a.getId().compareTo(b.getId());
+            }
+        });
+
+        for (ManhuntMode mode : modes) {
+            if (i >= slots.length) break;
+            addModeItem(inv, slots[i++], mode);
+        }
+
+        addBackItem(inv, 45);
+        player.openInventory(inv);
+    }
+
     private void addModeItem(Inventory inv, int slot, ManhuntMode mode) {
-        ItemStack item = new ItemStack(mode.getGameType().name().contains("SPEEDRUN") ? Material.COMPASS : Material.BOOK);
+        Material mat = Material.BOOK;
+        if (mode.getGameType().name().contains("SPEEDRUN")) mat = Material.COMPASS;
+        else if (mode.getGameType() == GameType.DEATHSWAP) mat = Material.ENDER_PEARL;
+
+        ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("§6§lMode: " + mode.getId());
         List<String> lore = new ArrayList<>();
-        lore.add("§7Players: §f" + mode.getMinPlayers() + "v" + (mode.getMaxPlayers() - mode.getMinPlayers()));
+        if (mode.getGameType() == GameType.DEATHSWAP) {
+            lore.add("§7Players: §f" + mode.getMaxPlayers());
+        } else {
+            lore.add("§7Players: §f" + mode.getMinPlayers() + "v" + (mode.getMaxPlayers() - mode.getMinPlayers()));
+        }
         lore.add("");
         lore.add("§eClick to view slots");
         meta.setLore(lore);
@@ -210,7 +247,8 @@ public class ManhuntGUI {
         if (type == GameType.MANHUNT) prefix += "Manhunt: ";
         else if (type == GameType.SPEEDRUN) prefix += "Speedrun: ";
         else if (type == GameType.PRACTICE_MANHUNT) prefix += "Practice Manhunt: ";
-        else prefix += "Practice Speedrun: ";
+        else if (type == GameType.PRACTICE_SPEEDRUN) prefix += "Practice Speedrun: ";
+        else if (type == GameType.DEATHSWAP) prefix += "DeathSwap: ";
         
         String title = prefix + modeId;
         Inventory inv = Bukkit.createInventory(player, 54, title);
@@ -258,6 +296,9 @@ public class ManhuntGUI {
                 } else if (title.startsWith("Slots Practice Speedrun: ")) {
                     type = GameType.PRACTICE_SPEEDRUN;
                     modeId = title.substring(25);
+                } else if (title.startsWith("Slots DeathSwap: ")) {
+                    type = GameType.DEATHSWAP;
+                    modeId = title.substring(17);
                 }
 
                 if (type != null && modeId != null) {

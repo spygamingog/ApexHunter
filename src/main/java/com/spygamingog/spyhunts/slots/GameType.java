@@ -4,7 +4,8 @@ public enum GameType {
     MANHUNT("manhunt", "manhunt"),
     SPEEDRUN("speedrun", "speedrun"),
     PRACTICE_MANHUNT("practice_manhunt", "practice/practice_manhunt"),
-    PRACTICE_SPEEDRUN("practice_speedrun", "practice/practice_speedrun");
+    PRACTICE_SPEEDRUN("practice_speedrun", "practice/practice_speedrun"),
+    DEATHSWAP("deathswap", "deathswap");
 
     private final String worldNamePart;
     private final String container;

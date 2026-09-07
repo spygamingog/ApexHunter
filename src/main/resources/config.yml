@@ -65,6 +65,20 @@ compass_update_interval: 20
 movement_update_threshold: 4.0
 
 # ----------------------------------------------------------
+# DeathSwap Settings
+# ----------------------------------------------------------
+deathswap:
+  # Swap interval progression in minutes (loops last interval when exhausted)
+  intervals:
+    - 5
+    - 5
+    - 10
+    - 10
+    - 15
+    - 15
+  grind_time_seconds: 300
+
+# ----------------------------------------------------------
 # External Hub Server Transfer
 # ----------------------------------------------------------
 hub:

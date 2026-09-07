@@ -44,6 +44,7 @@ public class SpyHuntsPlugin extends JavaPlugin {
     private com.spygamingog.spyhunts.managers.FreezeManager freezeManager;
     private com.spygamingog.spyhunts.managers.TabListManager tabListManager;
     private com.spygamingog.spyhunts.managers.HologramManager hologramManager;
+    private com.spygamingog.spyhunts.managers.DeathSwapManager deathSwapManager;
     private com.spygamingog.spyhunts.listeners.AdvancementTrackingListener advancementTrackingListener;
 
     public static SpyHuntsPlugin getInstance() {
@@ -80,6 +81,7 @@ public class SpyHuntsPlugin extends JavaPlugin {
     public com.spygamingog.spyhunts.managers.FreezeManager getFreezeManager() { return freezeManager; }
     public com.spygamingog.spyhunts.managers.TabListManager getTabListManager() { return tabListManager; }
     public com.spygamingog.spyhunts.managers.HologramManager getHologramManager() { return hologramManager; }
+    public com.spygamingog.spyhunts.managers.DeathSwapManager getDeathSwapManager() { return deathSwapManager; }
     public com.spygamingog.spyhunts.listeners.AdvancementTrackingListener getAdvancementTrackingListener() { return advancementTrackingListener; }
 
 
@@ -115,6 +117,7 @@ public class SpyHuntsPlugin extends JavaPlugin {
         freezeManager = new com.spygamingog.spyhunts.managers.FreezeManager(this);
         tabListManager = new com.spygamingog.spyhunts.managers.TabListManager(this);
         hologramManager = new com.spygamingog.spyhunts.managers.HologramManager(this);
+        deathSwapManager = new com.spygamingog.spyhunts.managers.DeathSwapManager(this);
         advancementTrackingListener = new com.spygamingog.spyhunts.listeners.AdvancementTrackingListener(this);
         playerDataManager.startAutoSaveTask();
         getServer().getPluginManager().registerEvents(new InventoryListener(slotManager), this);
@@ -134,6 +137,9 @@ public class SpyHuntsPlugin extends JavaPlugin {
         getCommand("speedrun").setTabCompleter(new com.spygamingog.spyhunts.commands.SpeedrunCommand(this));
         getCommand("practice").setExecutor(new com.spygamingog.spyhunts.commands.PracticeCommand(this));
         getCommand("practice").setTabCompleter(new com.spygamingog.spyhunts.commands.PracticeCommand(this));
+        com.spygamingog.spyhunts.commands.DeathSwapCommand deathSwapCmd = new com.spygamingog.spyhunts.commands.DeathSwapCommand(this);
+        getCommand("deathswap").setExecutor(deathSwapCmd);
+        getCommand("deathswap").setTabCompleter(deathSwapCmd);
         getCommand("worker").setExecutor(new com.spygamingog.spyhunts.commands.WorkerCommand(this));
         getCommand("worker").setTabCompleter(new com.spygamingog.spyhunts.commands.WorkerCommand(this));
         getCommand("lobby").setExecutor(new LobbyCommand(this));

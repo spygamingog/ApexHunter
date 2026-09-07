@@ -390,8 +390,11 @@ public class WorldFactoryManager {
                     plugin.getLogger().info("Slot 0 Factory: FORCE Allotment Complete: " + slot.getFullId());
                     
                     // Announce in main lobby
-                    String typeName = slot.getGameType() == GameType.MANHUNT ? "Manhunt" : 
-                                     slot.getGameType() == GameType.SPEEDRUN ? "Speedrun" : "Practice";
+                    String typeName;
+                    if (slot.getGameType() == GameType.MANHUNT) typeName = "Manhunt";
+                    else if (slot.getGameType() == GameType.SPEEDRUN) typeName = "Speedrun";
+                    else if (slot.getGameType() == GameType.DEATHSWAP) typeName = "DeathSwap";
+                    else typeName = "Practice";
                     String msg = "§b§l[" + typeName + "] §f" + slot.getModeId() + " " + slot.getSlotId() + " §aUp!";
                     Location lobby = plugin.getLobbyManager().getMainLobby();
                     World lobbyWorld = plugin.getLobbyManager().getSafeWorld(lobby);

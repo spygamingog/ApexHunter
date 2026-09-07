@@ -50,6 +50,15 @@ public class SlotDataManager {
         save();
     }
 
+    public boolean isSlotGrindPhase(String modeId, String slotId, String type) {
+        return getConfig().getBoolean("modes." + type + "." + modeId + ".slots." + slotId + ".grindPhase", false);
+    }
+
+    public void setSlotGrindPhase(String modeId, String slotId, String type, boolean grindPhase) {
+        getConfig().set("modes." + type + "." + modeId + ".slots." + slotId + ".grindPhase", grindPhase);
+        save();
+    }
+
     public void setSlotStatus(String modeId, String slotId, String type, String status) {
         getConfig().set("modes." + type + "." + modeId + ".slots." + slotId + ".status", status);
         save();

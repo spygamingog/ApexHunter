@@ -123,16 +123,32 @@ public class ScoreboardManager {
         // Also apply prefix via Scoreboard Team for extra stability
         if (role != null) {
             Scoreboard board = player.getScoreboard();
-            String teamName = role.equalsIgnoreCase("speedrunner") ? "runner_tab" : "hunter_tab";
+            String teamName;
+            if (role.equalsIgnoreCase("speedrunner")) {
+                teamName = "runner_tab";
+            } else if (role.equalsIgnoreCase("hunter")) {
+                teamName = "hunter_tab";
+            } else if (role.startsWith("team")) {
+                teamName = role.toLowerCase() + "_tab";
+            } else {
+                teamName = "player_tab";
+            }
             Team team = board.getTeam(teamName);
             if (team == null) {
                 team = board.registerNewTeam(teamName);
                 if (role.equalsIgnoreCase("speedrunner")) {
                     team.setPrefix("§a[Runner] ");
                     team.setColor(ChatColor.GREEN);
-                } else {
+                } else if (role.equalsIgnoreCase("hunter")) {
                     team.setPrefix("§c[Hunter] ");
                     team.setColor(ChatColor.RED);
+                } else if (role.startsWith("team")) {
+                    String letter = role.substring(4).toUpperCase();
+                    team.setPrefix("§7[§aTeam " + letter + "§7] §f");
+                    team.setColor(ChatColor.YELLOW);
+                } else {
+                    team.setPrefix("");
+                    team.setColor(ChatColor.WHITE);
                 }
             }
             if (!team.hasEntry(player.getName())) {
@@ -274,6 +290,9 @@ public class ScoreboardManager {
         } else if (slot.getGameType() == com.spygamingog.spyhunts.slots.GameType.PRACTICE_MANHUNT || slot.getGameType() == com.spygamingog.spyhunts.slots.GameType.PRACTICE_SPEEDRUN) {
             titleKey = "PRACTICE";
             titleColor = ChatColor.GREEN;
+        } else if (slot.getGameType() == com.spygamingog.spyhunts.slots.GameType.DEATHSWAP) {
+            titleKey = "DEATHSWAP";
+            titleColor = ChatColor.RED;
         }
 
         String title = titleColor + "§l" + titleKey;
@@ -301,7 +320,9 @@ public class ScoreboardManager {
         addStructureLines(player, slot, lines);
 
         String timeStr;
-        if (slot.getWaitSeconds() > 0) {
+        if (slot.getGameType() == com.spygamingog.spyhunts.slots.GameType.DEATHSWAP && slot.isGrindPhase()) {
+            timeStr = formatTime(slot.getWaitSeconds());
+        } else if (slot.getWaitSeconds() > 0) {
             timeStr = formatTime(slot.getWaitSeconds());
         } else if (slot.getGameSeconds() > 0) {
             timeStr = formatTime(slot.getGameSeconds());
@@ -310,12 +331,15 @@ public class ScoreboardManager {
         }
 
         String roleStr = getRoleColor(player) + getRoleName(player);
+        String modeDisplay = (slot.getGameType() == com.spygamingog.spyhunts.slots.GameType.DEATHSWAP)
+                ? slot.getModeId() + " Player"
+                : slot.getModeId();
 
         List<String> formattedLines = new ArrayList<>();
         for (String line : lines) {
             formattedLines.add(ChatColor.translateAlternateColorCodes('&', line
-                    .replace("{mode}", slot.getModeId())
-                    .replace("{mode_id}", slot.getModeId())
+                    .replace("{mode}", modeDisplay)
+                    .replace("{mode_id}", modeDisplay)
                     .replace("{players}", String.valueOf(slot.getQueueSize()))
                     .replace("{max_players}", String.valueOf(slot.getMaxPlayers()))
                     .replace("{time}", timeStr)
@@ -443,12 +467,17 @@ public class ScoreboardManager {
     private String getRoleColor(Player player) {
         String role = plugin.getPlayerDataManager().getRoleFromCache(player.getUniqueId());
         if (role == null) return "§7";
-        return role.equalsIgnoreCase("speedrunner") ? "§a" : "§c";
+        if (role.equalsIgnoreCase("speedrunner")) return "§a";
+        if (role.equalsIgnoreCase("hunter")) return "§c";
+        if (role.startsWith("team")) return "§e";
+        return "§f";
     }
 
     private String getRoleName(Player player) {
         String role = plugin.getPlayerDataManager().getRoleFromCache(player.getUniqueId());
         if (role == null) return "None";
+        if (role.equalsIgnoreCase("player")) return "Player";
+        if (role.startsWith("team")) return "Team " + role.substring(4).toUpperCase();
         return role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
     }
 

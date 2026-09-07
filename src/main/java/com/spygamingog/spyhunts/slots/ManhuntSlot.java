@@ -45,6 +45,7 @@ public class ManhuntSlot {
 
     private boolean hasEverRun = false;
     private boolean skipTimer = false;
+    private boolean isGrindPhase = false;
 
     public ManhuntSlot(com.spygamingog.spyhunts.SpyHuntsPlugin plugin, String modeId, String slotId, int minPlayers, int maxPlayers, String overworldName, String netherName, String endName, int countdownSeconds, GameType gameType) {
         this.plugin = plugin;
@@ -70,10 +71,18 @@ public class ManhuntSlot {
         this.gameType = gameType;
     }
 
+    public boolean isGrindPhase() {
+        return isGrindPhase;
+    }
+
+    public void setGrindPhase(boolean isGrindPhase) {
+        this.isGrindPhase = isGrindPhase;
+    }
+
     public void startWaitTimer(int seconds, Runnable onEnd) {
         cancelWaitTimer();
         this.waitSeconds = seconds;
-        waitTimerTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        this.waitTimerTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (status != SlotStatus.RUNNING) {
                 cancelWaitTimer();
                 return;
@@ -107,6 +116,8 @@ public class ManhuntSlot {
                 gameSeconds = 60 * 60; // 60 minutes
             } else if (gameType == GameType.MANHUNT || gameType == GameType.PRACTICE_MANHUNT) {
                 gameSeconds = 120 * 60; // 2 hours for Manhunt modes
+            } else if (gameType == GameType.DEATHSWAP) {
+                gameSeconds = 60 * 60; // 1 hour for DeathSwap
             } else {
                 gameSeconds = 120 * 60; // 2 hours fallback
             }
@@ -355,8 +366,16 @@ public class ManhuntSlot {
         spectators.remove(uuid);
     }
 
+    public boolean isSpectator(UUID uuid) {
+        return spectators.contains(uuid);
+    }
+
     public Set<UUID> getSpectators() {
         return spectators;
+    }
+
+    public void removeActivePlayer(UUID uuid) {
+        activePlayers.remove(uuid);
     }
 
     public Set<UUID> getActivePlayers() {

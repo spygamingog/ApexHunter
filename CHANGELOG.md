@@ -14,7 +14,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Uniform `setLodestoneTracked(false)` and `setLodestone` across Overworld, Nether, and The End, eliminating erratic needle spin.
   - Movement threshold (4 blocks) and 1-second debounce packet throttling to prevent client inventory lag.
   - Dynamic lore showing target runner name, online/offline status, and total active runners.
-- **Admin Wildcard Permission**: Added `spyhunts.admin` wildcard permission encompassing all admin subcommands (`/badge`, `/leaderboard`, `/lobby`, `/practice`, `/speedrun`, `/stats`, `/worker`).
+- **DeathSwap Game Mode (`GameType.DEATHSWAP`)**:
+  - Full match lifecycle with a 5-minute initial resource Grind Phase (`isGrindPhase`) where PvP is disabled.
+  - Periodic cyclic teleportation swapping ($P_1 \to Loc(P_2), P_2 \to Loc(P_3), \dots, P_n \to Loc(P_1)$) across configurable intervals (`deathswap.intervals`).
+  - Safe teleportation mechanics resetting fall distance (`p.setFallDistance(0.0f)`), dismounting vehicles, and triggering auditory/visual cues.
+  - 10-second warning countdowns with note block audio cues, action bar timers, and on-screen countdowns.
+  - Last-survivor win condition with automatic spectator mode conversion upon player elimination.
+  - Dedicated `/deathswap` command (alias `/ds`) with subcommands (`add`, `remove`, `stop`, `skip`), admin permission checks (`deathswap.admin`), and GUI matchmaking (`openDeathSwapMain`).
+  - Dynamic scoreboard titles (`§c§lDEATHSWAP`), grind phase countdown timers, and team prefixes (`[Team A]`, `[Team B]`, etc.) in TabList.
+- **ProGuard `AbstractMethodError` Fix**:
+  - Resolved runtime `AbstractMethodError` in scheduler tasks by adding explicit keep rules in `proguard.pro` for `public void run()`, `onCommand()`, and `onTabComplete()` across all Runnables and BukkitRunnables.
+- **Admin Wildcard Permission**: Added `spyhunts.admin` wildcard permission encompassing all admin subcommands (`/badge`, `/deathswap`, `/leaderboard`, `/lobby`, `/practice`, `/speedrun`, `/stats`, `/worker`).
 - **Thread-Safe Safe-Async Storage**: Implemented atomic in-memory snapshotting in `MultiDataManager` to eliminate file corruption and concurrency race conditions during YAML disk writes.
 
 ### Changed
