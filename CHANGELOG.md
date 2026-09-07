@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Repository Cleanliness**: Configured clean `.gitignore` to maintain internal agent docs locally while tracking only public distribution files. Purged stale build and compilation logs.
 
 ### Fixed
+- **Chunky Soft-Dependency Decoupling**: Encapsulated optional `ChunkyAPI` calls behind `ChunkyHook` with runtime plugin availability checks, eliminating `NoClassDefFoundError` when running on servers without the Chunky plugin.
 - **Slot 0 Worker Deadlock**: Resolved critical server hang caused by nested synchronous schedulers in Slot 0 world creation by introducing a safe `CountDownLatch` pattern in `runSync`.
 - **World Deletion Pipeline**: Streamlined slot world cleanup by leveraging unified asynchronous `SpyAPI.deleteWorld` operations with OS file lock release delays.
 - **Version Alignment**: Corrected startup banner and configuration discrepancies to reflect `2.0.0` accurately.

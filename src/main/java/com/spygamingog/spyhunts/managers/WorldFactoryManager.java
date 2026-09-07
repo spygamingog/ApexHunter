@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.popcraft.chunky.api.ChunkyAPI;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -29,7 +28,7 @@ public class WorldFactoryManager {
     private final AtomicBoolean isWaitingForTimer = new AtomicBoolean(false);
     private final AtomicInteger activeClones = new AtomicInteger(0);
     private org.bukkit.scheduler.BukkitTask currentTask = null;
-    private ChunkyAPI chunkyApi = null;
+    private ChunkyHook chunkyHook = null;
 
     private String currentWorldWaitingFor = null;
     private String currentTargetSlotId = null;
@@ -52,10 +51,17 @@ public class WorldFactoryManager {
         this.isPaused.set(true);
         this.isSlot0Ready.set(plugin.getWorkerDataManager().isFactoryReady());
         
-        // Initialize Chunky API
-        this.chunkyApi = plugin.getServer().getServicesManager().load(ChunkyAPI.class);
-        if (this.chunkyApi == null) {
-            plugin.getLogger().warning("Slot 0 Factory: Chunky API not found! Fallback to commands will be used.");
+        // Initialize Chunky API safely if plugin is present
+        if (plugin.getServer().getPluginManager().isPluginEnabled("Chunky")) {
+            try {
+                this.chunkyHook = new ChunkyHook();
+                plugin.getLogger().info("Slot 0 Factory: Chunky API hooked successfully.");
+            } catch (Throwable t) {
+                plugin.getLogger().warning("Slot 0 Factory: Failed to hook Chunky API (" + t.getMessage() + "). Fallback to commands will be used.");
+                this.chunkyHook = null;
+            }
+        } else {
+            plugin.getLogger().info("Slot 0 Factory: Chunky plugin not present. Fallback to commands will be used.");
         }
 
         // Auto-start if not ready and not paused
@@ -100,9 +106,9 @@ public class WorldFactoryManager {
         int radius = plugin.getConfig().getInt("factory.generation_radius", 100);
         // Use full Bukkit world name for Chunky
         String fullWorldName = "spycore-worlds/" + worldName;
-        if (chunkyApi != null) {
-            chunkyApi.cancelTask(fullWorldName);
-            chunkyApi.startTask(fullWorldName, "circle", 0, 0, radius, radius, "spiral");
+        if (chunkyHook != null) {
+            chunkyHook.cancelTask(fullWorldName);
+            chunkyHook.startTask(fullWorldName, radius);
         } else {
             executeCommand("chunky world " + fullWorldName);
             executeCommand("chunky shape circle");
@@ -136,14 +142,14 @@ public class WorldFactoryManager {
             // Remove wait time so next start is instant
             plugin.getWorkerDataManager().setWorkerNextRunTime(0);
             
-            if (chunkyApi != null) {
+            if (chunkyHook != null) {
                 if (currentWorldWaitingFor != null) {
-                    chunkyApi.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
+                    chunkyHook.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
                 }
                 // Ensure all possible slot0 tasks are stopped
-                chunkyApi.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
-                chunkyApi.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
-                chunkyApi.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
+                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
+                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
+                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
             } else {
                 executeCommand("chunky stop");
             }
@@ -808,13 +814,13 @@ public class WorldFactoryManager {
 
     public void forceClone(ManhuntSlot slot, Runnable onComplete) {
         // Stop Chunky if running
-        if (chunkyApi != null) {
+        if (chunkyHook != null) {
             if (currentWorldWaitingFor != null) {
-                chunkyApi.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
+                chunkyHook.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
             }
-            chunkyApi.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
-            chunkyApi.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
-            chunkyApi.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
+            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
+            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
+            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
         } else {
             executeCommand("chunky stop");
         }
