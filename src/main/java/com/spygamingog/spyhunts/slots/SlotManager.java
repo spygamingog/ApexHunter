@@ -476,6 +476,10 @@ public class SlotManager {
     }
 
     public void stopSlot(String modeId, String slotId, GameType type) {
+        stopSlot(modeId, slotId, type, null);
+    }
+
+    public void stopSlot(String modeId, String slotId, GameType type, WinnerType winner) {
         ManhuntSlot slot = getSlot(modeId, slotId, type);
         if (slot == null) return;
 
@@ -494,6 +498,8 @@ public class SlotManager {
                 p.setGameMode(GameMode.SPECTATOR);
             }
         }
+
+        final WinnerType finalWinner = winner;
 
         new org.bukkit.scheduler.BukkitRunnable() {
             int remaining = 30;
@@ -518,7 +524,7 @@ public class SlotManager {
 
                 if (remaining <= 0) {
                     this.cancel();
-                    finalizeStop(slot, players);
+                    finalizeStop(slot, players, finalWinner);
                     System.gc(); // Trigger GC for RAM cleanup
                 }
                 remaining--;
@@ -526,9 +532,22 @@ public class SlotManager {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
-    private void finalizeStop(ManhuntSlot slot, Set<UUID> players) {
-        int gameEndCooldown = plugin.getConfig().getInt("game_end_cooldown_seconds", 900);
-        long cooldownUntil = System.currentTimeMillis() + (gameEndCooldown * 1000L);
+    private void finalizeStop(ManhuntSlot slot, Set<UUID> players, WinnerType winner) {
+        int cooldownSeconds = (winner == WinnerType.QUIT)
+                ? plugin.getConfig().getInt("quit_cooldown_seconds", 7200)
+                : plugin.getConfig().getInt("game_end_cooldown_seconds", 1800);
+        long cooldownUntil = System.currentTimeMillis() + (cooldownSeconds * 1000L);
+
+        String durationStr;
+        if (cooldownSeconds >= 3600) {
+            long hours = cooldownSeconds / 3600;
+            durationStr = hours + " hour" + (hours > 1 ? "s" : "");
+        } else if (cooldownSeconds >= 60) {
+            long mins = cooldownSeconds / 60;
+            durationStr = mins + " minute" + (mins > 1 ? "s" : "");
+        } else {
+            durationStr = cooldownSeconds + " second" + (cooldownSeconds > 1 ? "s" : "");
+        }
 
         for (UUID uuid : players) {
             Player p = Bukkit.getPlayer(uuid);
@@ -544,7 +563,9 @@ public class SlotManager {
                     if (t.equalsIgnoreCase("hunter")) p.removeScoreboardTag(t);
                 });
                 lobbyManager.teleportToMainLobby(p);
-                String cooldownMsg = "§eGame ended. Please wait 15 minutes before joining another game.";
+                String cooldownMsg = (winner == WinnerType.QUIT)
+                        ? "§cGame quit. Cooldown: Please wait " + durationStr + " before joining another game."
+                        : "§eGame ended. Please wait " + durationStr + " before joining another game.";
                 p.sendMessage(cooldownMsg);
             }
             playerDataManager.setCooldown(uuid, cooldownUntil);
@@ -704,12 +725,12 @@ public class SlotManager {
                         }
                     }
                 }
-                stopSlot(modeId, slotId, type);
+                stopSlot(modeId, slotId, type, winner);
                 return; // Prevent normal stopSlot call
             }
         }
 
-        stopSlot(modeId, slotId, type);
+        stopSlot(modeId, slotId, type, winner);
     }
 
     public String getActiveModeIdFor(Player player) {

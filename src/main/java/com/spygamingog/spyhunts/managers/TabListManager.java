@@ -19,8 +19,33 @@ public class TabListManager {
     }
 
     public void updateAllPlayers() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            updateVisibility(p);
+        java.util.Collection<? extends Player> online = Bukkit.getOnlinePlayers();
+        if (online.isEmpty()) return;
+
+        java.util.Map<Player, String> contexts = new java.util.HashMap<>();
+        for (Player p : online) {
+            contexts.put(p, getContext(p));
+        }
+
+        java.util.List<Player> playerList = new java.util.ArrayList<>(online);
+        int size = playerList.size();
+
+        for (int i = 0; i < size; i++) {
+            Player p1 = playerList.get(i);
+            String c1 = contexts.get(p1);
+
+            for (int j = i + 1; j < size; j++) {
+                Player p2 = playerList.get(j);
+                String c2 = contexts.get(p2);
+
+                if (c1 != null && c1.equals(c2)) {
+                    if (!p1.canSee(p2)) p1.showPlayer(plugin, p2);
+                    if (!p2.canSee(p1)) p2.showPlayer(plugin, p1);
+                } else {
+                    if (p1.canSee(p2)) p1.hidePlayer(plugin, p2);
+                    if (p2.canSee(p1)) p2.hidePlayer(plugin, p1);
+                }
+            }
         }
     }
 
@@ -33,11 +58,11 @@ public class TabListManager {
             String otherContext = getContext(other);
             
             if (playerContext != null && playerContext.equals(otherContext)) {
-                player.showPlayer(plugin, other);
-                other.showPlayer(plugin, player);
+                if (!player.canSee(other)) player.showPlayer(plugin, other);
+                if (!other.canSee(player)) other.showPlayer(plugin, player);
             } else {
-                player.hidePlayer(plugin, other);
-                other.hidePlayer(plugin, player);
+                if (player.canSee(other)) player.hidePlayer(plugin, other);
+                if (other.canSee(player)) other.hidePlayer(plugin, player);
             }
         }
     }

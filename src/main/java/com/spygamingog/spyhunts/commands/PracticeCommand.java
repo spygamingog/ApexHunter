@@ -55,7 +55,7 @@ public class PracticeCommand implements CommandExecutor, TabCompleter {
 
         // Admin commands
         if (sub.equals("add") || sub.equals("remove") || sub.equals("stop") || sub.equals("start") || sub.equals("cooldown") || sub.equals("removecooldown")) {
-            if (!sender.hasPermission("practice.admin")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("practice.admin")) {
                 sender.sendMessage("§cNo permission.");
                 return true;
             }

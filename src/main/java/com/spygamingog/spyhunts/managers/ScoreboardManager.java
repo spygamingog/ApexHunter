@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,29 +165,19 @@ public class ScoreboardManager {
             }
         }
 
-        List<String> lines = new ArrayList<>();
-        lines.add("&7&m------------------");
-        lines.add("&fOnline Players: &b{online}");
-        lines.add("&fActive Games: &a{active}");
-        lines.add("&fQueueing: &e{queueing}");
-        lines.add("");
-        lines.add("&6&lYour Stats:");
-        String badge = plugin.getPlayerDataManager().getBadge(player.getUniqueId());
-        if (badge != null && !badge.isEmpty()) {
-            lines.add("&fTitle: " + ChatColor.translateAlternateColorCodes('&', badge));
-        }
-        lines.add("&fWins: &a{wins}");
-        lines.add("&fLosses: &c{losses}");
-        
-        if (plugin.getPlayerDataManager().isOnCooldown(player.getUniqueId())) {
-            long rem = plugin.getPlayerDataManager().getCooldownRemaining(player.getUniqueId()) / 1000L;
-            lines.add("&fCooldown: &e" + formatTime(rem));
-        }
-        
-        lines.add("");
-        lines.add("&fIP: &aspyxhunter.minecraft.pe");
-        lines.add("&fPort: &b7101");
-        lines.add("&7&m------------------");
+        List<String> rawLines = plugin.getConfig().getStringList("scoreboards.main_lobby.lines");
+        List<String> lines = (rawLines != null && !rawLines.isEmpty()) ? new ArrayList<>(rawLines) : Arrays.asList(
+            "&7&m------------------",
+            "&fOnline Players: &b{online}",
+            "&fActive Games: &a{active}",
+            "&fQueueing: &e{queueing}",
+            "",
+            "&6&lYour Stats:",
+            "&fWins: &a{wins}",
+            "&fLosses: &c{losses}",
+            "",
+            "&7&m------------------"
+        );
 
         int online = Bukkit.getOnlinePlayers().size();
         int active = 0;
@@ -205,6 +196,9 @@ public class ScoreboardManager {
             losses += plugin.getPlayerDataManager().getLosses(player.getUniqueId(), type);
         }
 
+        String badge = plugin.getPlayerDataManager().getBadge(player.getUniqueId());
+        String titleStr = (badge != null && !badge.isEmpty()) ? ChatColor.translateAlternateColorCodes('&', badge) : "";
+
         List<String> formattedLines = new ArrayList<>();
         for (String line : lines) {
             formattedLines.add(ChatColor.translateAlternateColorCodes('&', line
@@ -212,7 +206,9 @@ public class ScoreboardManager {
                     .replace("{active}", String.valueOf(active))
                     .replace("{queueing}", String.valueOf(queueing))
                     .replace("{wins}", String.valueOf(wins))
-                    .replace("{losses}", String.valueOf(losses))));
+                    .replace("{losses}", String.valueOf(losses))
+                    .replace("{title}", titleStr)
+                    .replace("{player}", player.getName())));
         }
 
         updateScoreboardLines(player, board, obj, formattedLines);
@@ -224,7 +220,7 @@ public class ScoreboardManager {
             board = Bukkit.getScoreboardManager().getNewScoreboard();
         }
 
-        String title = ChatColor.translateAlternateColorCodes('&', "&e&lWAITING LOBBY");
+        String title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("scoreboards.queue_lobby.title", "&a&lWAITING LOBBY"));
         Objective obj = board.getObjective("queue_lobby");
         if (obj == null) {
             obj = board.registerNewObjective("queue_lobby", "dummy", title);
@@ -235,27 +231,30 @@ public class ScoreboardManager {
             }
         }
 
-        List<String> lines = new ArrayList<>();
-        lines.add("&7&m------------------");
-        lines.add("&fSlot: &e" + slot.getSlotId());
-        lines.add("&fMode: &b" + slot.getModeId());
-        lines.add("");
-        lines.add("&fPlayers: &e{players}/{max_players}");
-        lines.add("");
-        if (slot.getCountdown() > 0) {
-            lines.add("&fStarting in: &a" + slot.getCountdown() + "s");
-        } else {
-            lines.add("&fStatus: &7Waiting...");
-        }
-        lines.add("&7&m------------------");
-        lines.add("&fIP: &aspyxhunter.minecraft.pe");
-        lines.add("&fPort: &b7101");
+        List<String> rawLines = plugin.getConfig().getStringList("scoreboards.queue_lobby.lines");
+        List<String> lines = (rawLines != null && !rawLines.isEmpty()) ? new ArrayList<>(rawLines) : Arrays.asList(
+            "&7&m------------------",
+            "&fSlot: &e{slot_name}",
+            "&fMode: &b{mode_id}",
+            "",
+            "&fPlayers: &e{players}/{max_players}",
+            "",
+            "&7&m------------------"
+        );
+
+        String countdownStr = slot.getCountdown() > 0 ? (slot.getCountdown() + "s") : "Waiting...";
 
         List<String> formattedLines = new ArrayList<>();
         for (String line : lines) {
             formattedLines.add(ChatColor.translateAlternateColorCodes('&', line
+                    .replace("{slot}", slot.getSlotId())
+                    .replace("{slot_name}", slot.getSlotId())
+                    .replace("{mode}", slot.getModeId())
+                    .replace("{mode_id}", slot.getModeId())
                     .replace("{players}", String.valueOf(slot.getQueueSize()))
-                    .replace("{max_players}", String.valueOf(slot.getMaxPlayers()))));
+                    .replace("{max_players}", String.valueOf(slot.getMaxPlayers()))
+                    .replace("{time}", countdownStr)
+                    .replace("{player}", player.getName())));
         }
 
         updateScoreboardLines(player, board, obj, formattedLines);
@@ -288,30 +287,41 @@ public class ScoreboardManager {
             }
         }
 
-        List<String> lines = new ArrayList<>();
-        lines.add("&7&m------------------");
-        lines.add("&fMode: &e" + slot.getModeId());
-        lines.add("");
-        if (slot.getWaitSeconds() > 0) {
-            lines.add("&fGame starts in: &a" + formatTime(slot.getWaitSeconds()));
-        } else if (slot.getGameSeconds() > 0) {
-            lines.add("&fTime Elapsed: &a" + formatTime(slot.getGameSeconds()));
-        }
-        lines.add("&fPlayers: &e{players}");
+        List<String> rawLines = plugin.getConfig().getStringList("scoreboards.game.lines");
+        List<String> lines = (rawLines != null && !rawLines.isEmpty()) ? new ArrayList<>(rawLines) : Arrays.asList(
+            "&7&m------------------",
+            "&fMode: &e{mode_id}",
+            "&fTime Left: &a{time_left}",
+            "&fPlayers: &e{players}",
+            "&fRole: &e{role}",
+            "&7&m------------------"
+        );
         
         // Add structure tracking for practice games
         addStructureLines(player, slot, lines);
-        
-        lines.add("");
-        lines.add("&fRole: " + getRoleColor(player) + getRoleName(player));
-        lines.add("&7&m------------------");
-        lines.add("&fIP: &aspyxhunter.minecraft.pe");
-        lines.add("&fPort: &b7101");
+
+        String timeStr;
+        if (slot.getWaitSeconds() > 0) {
+            timeStr = formatTime(slot.getWaitSeconds());
+        } else if (slot.getGameSeconds() > 0) {
+            timeStr = formatTime(slot.getGameSeconds());
+        } else {
+            timeStr = "00:00";
+        }
+
+        String roleStr = getRoleColor(player) + getRoleName(player);
 
         List<String> formattedLines = new ArrayList<>();
         for (String line : lines) {
             formattedLines.add(ChatColor.translateAlternateColorCodes('&', line
-                    .replace("{players}", String.valueOf(slot.getQueueSize()))));
+                    .replace("{mode}", slot.getModeId())
+                    .replace("{mode_id}", slot.getModeId())
+                    .replace("{players}", String.valueOf(slot.getQueueSize()))
+                    .replace("{max_players}", String.valueOf(slot.getMaxPlayers()))
+                    .replace("{time}", timeStr)
+                    .replace("{time_left}", timeStr)
+                    .replace("{role}", roleStr)
+                    .replace("{player}", player.getName())));
         }
 
         updateScoreboardLines(player, board, obj, formattedLines);

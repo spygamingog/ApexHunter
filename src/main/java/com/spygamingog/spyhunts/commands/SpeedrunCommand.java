@@ -59,7 +59,7 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
 
         // Admin commands
         if (sub.equals("add") || sub.equals("remove") || sub.equals("stop") || sub.equals("start") || sub.equals("cooldown") || sub.equals("removecooldown")) {
-            if (!sender.hasPermission("speedrun.admin")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("speedrun.admin")) {
                 sender.sendMessage("§cNo permission.");
                 return true;
             }
@@ -93,10 +93,6 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 
-                if (h == 0) {
-                    sender.sendMessage("§cSpeedrun modes must have hunters. For no hunters, use /practice add mode.");
-                    return true;
-                }
 
                 int min = r + h;
                 int max = r + h;

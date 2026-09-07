@@ -22,7 +22,7 @@ public class WorkerCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("manhunt.admin")) {
+        if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("manhunt.admin")) {
             sender.sendMessage("§cNo permission.");
             return true;
         }

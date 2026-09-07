@@ -1,10 +1,13 @@
 package com.spygamingog.spyhunts.data;
 
 import com.spygamingog.spyhunts.SpyHuntsPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +50,11 @@ public class MultiDataManager {
         if (df != null) df.save();
     }
 
+    public void saveSafeAsync(String key) {
+        DataFile df = dataFiles.get(key);
+        if (df != null) df.saveSafeAsync(plugin);
+    }
+
     public void saveAll() {
         for (DataFile df : dataFiles.values()) {
             df.save();
@@ -62,10 +70,37 @@ public class MultiDataManager {
             this.config = YamlConfiguration.loadConfiguration(file);
         }
 
-        public void save() {
+        public synchronized void save() {
             try {
-                config.save(file);
-            } catch (IOException ignored) {}
+                String yaml = config.saveToString();
+                Files.writeString(file.toPath(), yaml, StandardCharsets.UTF_8);
+            } catch (Exception ignored) {}
+        }
+
+        public void saveSafeAsync(SpyHuntsPlugin plugin) {
+            if (Bukkit.isPrimaryThread()) {
+                String yaml;
+                synchronized (this) {
+                    yaml = config.saveToString();
+                }
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    try {
+                        Files.writeString(file.toPath(), yaml, StandardCharsets.UTF_8);
+                    } catch (Exception ignored) {}
+                });
+            } else {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    String yaml;
+                    synchronized (this) {
+                        yaml = config.saveToString();
+                    }
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try {
+                            Files.writeString(file.toPath(), yaml, StandardCharsets.UTF_8);
+                        } catch (Exception ignored) {}
+                    });
+                });
+            }
         }
     }
 }

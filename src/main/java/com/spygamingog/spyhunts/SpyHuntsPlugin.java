@@ -79,6 +79,7 @@ public class SpyHuntsPlugin extends JavaPlugin {
     public WorldFactoryManager getWorldFactoryManager() { return worldFactoryManager; }
     public com.spygamingog.spyhunts.managers.FreezeManager getFreezeManager() { return freezeManager; }
     public com.spygamingog.spyhunts.managers.TabListManager getTabListManager() { return tabListManager; }
+    public com.spygamingog.spyhunts.managers.HologramManager getHologramManager() { return hologramManager; }
     public com.spygamingog.spyhunts.listeners.AdvancementTrackingListener getAdvancementTrackingListener() { return advancementTrackingListener; }
 
 
@@ -121,6 +122,7 @@ public class SpyHuntsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProtectionListener(lobbyManager), this);
         getServer().getPluginManager().registerEvents(new GameEndListener(slotManager, playerDataManager), this);
         getServer().getPluginManager().registerEvents(new CompassInteractListener(compassManager, speedrunnerManager), this);
+        getServer().getPluginManager().registerEvents(new com.spygamingog.spyhunts.listeners.CompassMovementListener(this), this);
         getServer().getPluginManager().registerEvents(new com.spygamingog.spyhunts.listeners.WorldVisitListener(slotManager, playerDataManager), this);
         getServer().getPluginManager().registerEvents(new com.spygamingog.spyhunts.listeners.PortalListener(this), this);
         getServer().getPluginManager().registerEvents(advancementTrackingListener, this);

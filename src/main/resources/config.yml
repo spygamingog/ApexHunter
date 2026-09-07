@@ -37,19 +37,14 @@ freeze_duration_seconds: 120
 # ----------------------------------------------------------
 # World Factory (Background Worker)
 # ----------------------------------------------------------
-# The factory automatically generates fresh worlds in the background
-# so that games can start instantly without waiting for chunk generation.
+# The factory automatically prepares fresh template worlds in the background
+# so that games can start instantly without lag.
 factory:
   # Whether the factory starts automatically on server boot.
   paused: true
 
   # Interval (in minutes) to check if slots need pre-filling.
   wait_minutes: 15
-
-  # Chunky Generation Settings
-  generation_radius: 100
-  generation_pattern: "spiral"
-  generation_shape: "circle"
 
 # ----------------------------------------------------------
 # Slot Management
@@ -65,6 +60,17 @@ default_slots_per_mode: 3
 # ----------------------------------------------------------
 # How often (in ticks) the hunter's compass updates its target.
 compass_update_interval: 20
+
+# Minimum block distance movement before updating lodestone metadata
+movement_update_threshold: 4.0
+
+# ----------------------------------------------------------
+# External Hub Server Transfer
+# ----------------------------------------------------------
+hub:
+  # The command or proxy server to execute on /hub.
+  # If server is set, uses BungeeCord transfer: "server: hub" or custom command: "command: server hub"
+  command: "server hub"
 
 # ----------------------------------------------------------
 # Badge & Title Settings

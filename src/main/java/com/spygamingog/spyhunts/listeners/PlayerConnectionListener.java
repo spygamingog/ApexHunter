@@ -54,7 +54,11 @@ public class PlayerConnectionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        
+
+        // Cache player name for holograms/leaderboards
+        com.spygamingog.spyhunts.SpyHuntsPlugin.getInstance().getHologramManager().cacheName(player.getUniqueId(), player.getName());
+        playerDataManager.setPlayerName(player.getUniqueId(), player.getName());
+
         // Update tablist visibility for everyone
         com.spygamingog.spyhunts.SpyHuntsPlugin.getInstance().getTabListManager().updateAllPlayers();
         
@@ -64,10 +68,11 @@ public class PlayerConnectionListener implements Listener {
             String slotId = playerDataManager.getActiveSlotId(player.getUniqueId());
             com.spygamingog.spyhunts.slots.GameType type = playerDataManager.getActiveType(player.getUniqueId());
             if (modeId != null && slotId != null && type != null) {
-                // Restore role tag in tab
+                // Restore role tag in tab and scoreboard tag
                 String role = playerDataManager.getRole(modeId, slotId, type, player.getUniqueId());
                 if (role != null) {
                     playerDataManager.updatePlayerTabName(player.getUniqueId(), role);
+                    player.addScoreboardTag(role);
                 }
                 
                 // Teleport back to the game and restore gamemode
@@ -79,8 +84,10 @@ public class PlayerConnectionListener implements Listener {
                     slotManager.resumeGameTimer(slot);
                 }
                 
-                // Restore inventory
-                playerDataManager.restoreInventory(player.getUniqueId(), player);
+                // Restore inventory if SpyInventories is not active
+                if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("SpyInventories")) {
+                    playerDataManager.restoreInventory(player.getUniqueId(), player);
+                }
             }
         } else {
             // Always handle lobby state on join if not in active manhunt

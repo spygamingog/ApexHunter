@@ -37,7 +37,7 @@ public class BadgeCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("give")) {
-            if (!sender.hasPermission("apexhunter.badge.admin")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("apexhunter.badge.admin")) {
                 sender.sendMessage("§cYou don't have permission to give titles.");
                 return true;
             }
@@ -57,7 +57,7 @@ public class BadgeCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("set")) {
-            if (!sender.hasPermission("apexhunter.badge.admin")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("apexhunter.badge.admin")) {
                 sender.sendMessage("§cYou don't have permission to set titles.");
                 return true;
             }
@@ -77,7 +77,7 @@ public class BadgeCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("remove")) {
-            if (!sender.hasPermission("apexhunter.badge.admin")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("apexhunter.badge.admin")) {
                 sender.sendMessage("§cYou don't have permission to remove titles.");
                 return true;
             }

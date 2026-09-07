@@ -25,7 +25,7 @@ public class LeaderboardCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("apexhunter.admin")) {
+        if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("apexhunter.admin")) {
             sender.sendMessage("§cNo permission.");
             return true;
         }

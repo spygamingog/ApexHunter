@@ -3,7 +3,7 @@ version: 2.0.0
 main: com.spygamingog.spyhunts.SpyHuntsPlugin
 api-version: '1.21'
 depend: [SpyCore]
-softdepend: [Chunky]
+softdepend: [SpyNetherPortals, SpyInventories]
 authors:
   - SpyGamingOG
 commands:
@@ -52,3 +52,15 @@ commands:
     description: Manage leaderboard holograms
     usage: /leaderboard <create|delete|list>
     aliases: [lb, top]
+
+permissions:
+  spyhunts.admin:
+    description: Master administrative permission for all SpyHunts systems
+    default: op
+    children:
+      manhunt.admin: true
+      speedrun.admin: true
+      practice.admin: true
+      apexhunter.admin: true
+      apexhunter.badge.admin: true
+      spyhunts.admin.stats: true

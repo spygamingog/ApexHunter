@@ -28,7 +28,7 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length >= 2 && args[0].equalsIgnoreCase("reset")) {
-            if (!sender.hasPermission("spyhunts.admin.stats")) {
+            if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("spyhunts.admin.stats")) {
                 sender.sendMessage("§cNo permission to reset stats.");
                 return true;
             }

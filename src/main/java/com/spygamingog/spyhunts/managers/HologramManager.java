@@ -12,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +21,13 @@ public class HologramManager {
     private final SpyHuntsPlugin plugin;
     private final PlayerDataManager playerDataManager;
     private final Map<String, List<ArmorStand>> activeHolograms = new HashMap<>();
+    private final Map<UUID, String> nameCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    public void cacheName(UUID uuid, String name) {
+        if (uuid != null && name != null) {
+            nameCache.put(uuid, name);
+        }
+    }
 
     public HologramManager(SpyHuntsPlugin plugin) {
         this.plugin = plugin;
@@ -150,8 +158,28 @@ public class HologramManager {
         for (int i = 0; i < 10; i++) {
             if (i < sorted.size()) {
                 Map.Entry<UUID, Integer> entry = sorted.get(i);
-                String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
-                if (name == null) name = "Unknown";
+                UUID uuid = entry.getKey();
+                String name = nameCache.get(uuid);
+                if (name == null) {
+                    Player online = Bukkit.getPlayer(uuid);
+                    if (online != null) {
+                        name = online.getName();
+                        nameCache.put(uuid, name);
+                    } else {
+                        String saved = playerDataManager.getPlayerName(uuid);
+                        if (saved != null && !saved.isEmpty()) {
+                            name = saved;
+                            nameCache.put(uuid, name);
+                        } else {
+                            name = Bukkit.getOfflinePlayer(uuid).getName();
+                            if (name != null) {
+                                nameCache.put(uuid, name);
+                            } else {
+                                name = "Unknown";
+                            }
+                        }
+                    }
+                }
                 String valStr = isTime ? formatTime(entry.getValue()) : String.valueOf(entry.getValue());
                 
                 String color = "§f";

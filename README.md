@@ -52,8 +52,10 @@
 ### Requirements
 - **Server Software**: [Paper](https://papermc.io), [Purpur](https://purpurmc.org), or compatible 1.21.1+ fork.
 - **Java**: Java 21 or newer.
-- **Core Dependency**: **[SpyCore](https://github.com/spygamingog/SpyCore)** (Required for multi-world container management).
-- **Optional Plugin**: **[Chunky](https://www.spigotmc.org/resources/chunky.81534/)** (Recommended for background chunk pre-generation).
+- **Core Dependency**: **[SpyCore](https://github.com/spygamingog/SpyCore)** 1.1.2+ (Required for multi-world container management).
+- **Recommended Companions**:
+  - **[SpyInventories](https://github.com/spygamingog/SpyCore)** (Authoritative companion for multi-world player inventory sync).
+  - **[SpyNetherPortals](https://github.com/spygamingog/SpyCore)** (Cross-dimensional portal routing).
 
 ### Setup Instructions
 1. Download `spyhunts-2.0.0.jar` and place it into your server's `plugins/` directory.
@@ -86,28 +88,28 @@
 ### Administrator Commands
 | Command | Permission | Description |
 | :--- | :--- | :--- |
-| `/manhunt add mode <id> [min] [max]` | `manhunt.admin` | Register a new Manhunt mode (e.g. `1v1`, `2v2`) |
-| `/manhunt add <mode> <slot>` | `manhunt.admin` | Add an instance slot to a mode |
-| `/manhunt remove <mode> [slot]` | `manhunt.admin` | Remove an instance slot or entire mode |
-| `/manhunt stop <mode> <slot>` | `manhunt.admin` | Force-terminate an active match |
-| `/manhunt start <mode> <slot>` | `manhunt.admin` | Force-start a queued match |
-| `/manhunt skip start <mode> <slot>` | `manhunt.admin` | Force-start immediately skipping warmup freeze |
-| `/manhunt cooldown <player> <sec>` | `manhunt.admin` | Apply match cooldown to a player |
-| `/manhunt removecooldown <player>` | `manhunt.admin` | Remove match cooldown from a player |
-| `/lobby set` | `manhunt.admin` | Set main lobby spawn at current position |
-| `/lobby create` | `manhunt.admin` | Create a new waiting lobby at current position |
-| `/lobby delete <name>` | `manhunt.admin` | Delete a waiting lobby |
-| `/lobby setup` | `manhunt.admin` | Automatically bind available lobbies to slots |
-| `/worker status` | `manhunt.admin` | View background world factory generation status |
-| `/worker pause` / `/worker resume` | `manhunt.admin` | Pause or resume background world worker |
-| `/worker reset` | `manhunt.admin` | Reset worker batch state and clean Slot 0 templates |
-| `/worker force <type:mode:slot>` | `manhunt.admin` | Force-generate worlds for a specific slot |
-| `/status <type> <mode> <slot> <status>` | `manhunt.admin` | Manually set slot status (`available`/`unavailable`) |
-| `/badge give <player> <title>` | `apexhunter.badge.admin` | Grant a badge title to a player |
-| `/badge set <player> <title>` | `apexhunter.badge.admin` | Set a player's active badge title |
-| `/badge remove <player>` | `apexhunter.badge.admin` | Clear a player's active badge title |
-| `/leaderboard create <id> <type> <mode>`| `apexhunter.admin` | Spawn a floating leaderboard hologram |
-| `/leaderboard delete <id>` | `apexhunter.admin` | Remove a leaderboard hologram |
+| `/manhunt add mode <id> [min] [max]` | `manhunt.admin` / `spyhunts.admin` | Register a new Manhunt mode (e.g. `1v1`, `2v2`) |
+| `/manhunt add <mode> <slot>` | `manhunt.admin` / `spyhunts.admin` | Add an instance slot to a mode |
+| `/manhunt remove <mode> [slot]` | `manhunt.admin` / `spyhunts.admin` | Remove an instance slot or entire mode |
+| `/manhunt stop <mode> <slot>` | `manhunt.admin` / `spyhunts.admin` | Force-terminate an active match |
+| `/manhunt start <mode> <slot>` | `manhunt.admin` / `spyhunts.admin` | Force-start a queued match |
+| `/manhunt skip start <mode> <slot>` | `manhunt.admin` / `spyhunts.admin` | Force-start immediately skipping warmup freeze |
+| `/manhunt cooldown <player> <sec>` | `manhunt.admin` / `spyhunts.admin` | Apply match cooldown to a player |
+| `/manhunt removecooldown <player>` | `manhunt.admin` / `spyhunts.admin` | Remove match cooldown from a player |
+| `/lobby set` | `manhunt.admin` / `spyhunts.admin` | Set main lobby spawn at current position |
+| `/lobby create` | `manhunt.admin` / `spyhunts.admin` | Create a new waiting lobby at current position |
+| `/lobby delete <name>` | `manhunt.admin` / `spyhunts.admin` | Delete a waiting lobby |
+| `/lobby setup` | `manhunt.admin` / `spyhunts.admin` | Automatically bind available lobbies to slots |
+| `/worker status` | `manhunt.admin` / `spyhunts.admin` | View background world factory generation status |
+| `/worker pause` / `/worker resume` | `manhunt.admin` / `spyhunts.admin` | Pause or resume background world worker |
+| `/worker reset` | `manhunt.admin` / `spyhunts.admin` | Reset worker batch state and clean Slot 0 templates |
+| `/worker force <type:mode:slot>` | `manhunt.admin` / `spyhunts.admin` | Force-generate worlds for a specific slot |
+| `/status <type> <mode> <slot> <status>` | `manhunt.admin` / `spyhunts.admin` | Manually set slot status (`available`/`unavailable`) |
+| `/badge give <player> <title>` | `apexhunter.badge.admin` / `spyhunts.admin` | Grant a badge title to a player |
+| `/badge set <player> <title>` | `apexhunter.badge.admin` / `spyhunts.admin` | Set a player's active badge title |
+| `/badge remove <player>` | `apexhunter.badge.admin` / `spyhunts.admin` | Clear a player's active badge title |
+| `/leaderboard create <id> <type> <mode>`| `apexhunter.admin` / `spyhunts.admin` | Spawn a floating leaderboard hologram |
+| `/leaderboard delete <id>` | `apexhunter.admin` / `spyhunts.admin` | Remove a leaderboard hologram |
 
 ---
 
@@ -115,7 +117,8 @@
 
 | Permission Node | Description | Default |
 | :--- | :--- | :--- |
-| `manhunt.admin` | Full administrative control over Manhunt games & lobbies | `op` |
+| `spyhunts.admin` | Wildcard granting full administrative control across all subcommands | `op` |
+| `manhunt.admin` | Administrative control over Manhunt games & lobbies | `op` |
 | `speedrun.admin` | Administrative control over Speedrun modes & slots | `op` |
 | `practice.admin` | Administrative control over Practice modes & slots | `op` |
 | `manhunt.admin.build` | Bypass lobby build/break protection | `op` |
@@ -156,7 +159,6 @@ freeze_duration_seconds: 120
 factory:
   paused: true                   # Worker starts paused on boot for safety
   wait_minutes: 15               # Rest cycle between batch checks
-  generation_radius: 100         # Chunky pre-generation radius
 
 # Slot Management
 slot_count_per_mode: 3           # Target available slots per mode
@@ -164,13 +166,22 @@ default_slots_per_mode: 3
 
 # Compass Tracking Settings
 compass_update_interval: 20      # Compass target sync interval (in ticks)
+movement_update_threshold: 4.0   # Block distance threshold before lodestone update
 
-# Pre-defined Titles
-available_titles:
-  - "&a[PRO]"
-  - "&b[GOD]"
-  - "&c[ELITE]"
-  - "&e[LEGEND]"
+# Hub Transfer
+hub:
+  command: "server hub"
+
+# Scoreboards
+scoreboards:
+  main_lobby:
+    title: "&6&lSPY HUNTS"
+    lines:
+      - "&7----------------"
+      - "&fOnline Players: &e{online}"
+      - "&fActive Games: &e{active}"
+      - "&fQueueing Games: &e{queueing}"
+      - "&7----------------"
 ```
 
 ---

@@ -32,6 +32,9 @@ public class RejoinCommand implements CommandExecutor {
         if (!ok) {
             p.sendMessage("Could not rejoin. The session might have ended.");
         } else {
+            if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("SpyInventories")) {
+                playerDataManager.restoreInventory(p.getUniqueId(), p);
+            }
             p.sendMessage("Rejoined your manhunt session.");
         }
         return true;

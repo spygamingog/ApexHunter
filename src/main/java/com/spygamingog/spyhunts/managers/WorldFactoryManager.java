@@ -28,7 +28,6 @@ public class WorldFactoryManager {
     private final AtomicBoolean isWaitingForTimer = new AtomicBoolean(false);
     private final AtomicInteger activeClones = new AtomicInteger(0);
     private org.bukkit.scheduler.BukkitTask currentTask = null;
-    private ChunkyHook chunkyHook = null;
 
     private String currentWorldWaitingFor = null;
     private String currentTargetSlotId = null;
@@ -50,19 +49,6 @@ public class WorldFactoryManager {
         // Always start paused for safety on server restart
         this.isPaused.set(true);
         this.isSlot0Ready.set(plugin.getWorkerDataManager().isFactoryReady());
-        
-        // Initialize Chunky API safely if plugin is present
-        if (plugin.getServer().getPluginManager().isPluginEnabled("Chunky")) {
-            try {
-                this.chunkyHook = new ChunkyHook();
-                plugin.getLogger().info("Slot 0 Factory: Chunky API hooked successfully.");
-            } catch (Throwable t) {
-                plugin.getLogger().warning("Slot 0 Factory: Failed to hook Chunky API (" + t.getMessage() + "). Fallback to commands will be used.");
-                this.chunkyHook = null;
-            }
-        } else {
-            plugin.getLogger().info("Slot 0 Factory: Chunky plugin not present. Fallback to commands will be used.");
-        }
 
         // Auto-start if not ready and not paused
         if (!isSlot0Ready.get() && !isPaused.get()) {
@@ -97,30 +83,6 @@ public class WorldFactoryManager {
         }
     }
 
-    private void startChunkyGeneration() {
-        // Bypassed as per user request
-        plugin.getLogger().info("Slot 0 Factory: Chunky generation is currently DISABLED.");
-    }
-
-    private void enqueueChunky(String worldName) {
-        int radius = plugin.getConfig().getInt("factory.generation_radius", 100);
-        // Use full Bukkit world name for Chunky
-        String fullWorldName = "spycore-worlds/" + worldName;
-        if (chunkyHook != null) {
-            chunkyHook.cancelTask(fullWorldName);
-            chunkyHook.startTask(fullWorldName, radius);
-        } else {
-            executeCommand("chunky world " + fullWorldName);
-            executeCommand("chunky shape circle");
-            executeCommand("chunky center 0 0");
-            executeCommand("chunky radius " + radius);
-            executeCommand("chunky start");
-        }
-    }
-
-    private void startQueuePolling() {
-        // Bypassed as per user request
-    }
 
     public boolean isReady() {
         return isSlot0Ready.get();
@@ -141,25 +103,12 @@ public class WorldFactoryManager {
             
             // Remove wait time so next start is instant
             plugin.getWorkerDataManager().setWorkerNextRunTime(0);
-            
-            if (chunkyHook != null) {
-                if (currentWorldWaitingFor != null) {
-                    chunkyHook.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
-                }
-                // Ensure all possible slot0 tasks are stopped
-                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
-                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
-                chunkyHook.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
-            } else {
-                executeCommand("chunky stop");
-            }
-            plugin.getLogger().info("Slot 0 Factory: Paused and Chunky stopped. Next run time reset to 0.");
+            plugin.getLogger().info("Slot 0 Factory: Paused. Next run time reset to 0.");
         }
         plugin.getWorkerDataManager().save(); // Persist immediately
         if (!paused && wasPaused) {
             if (isGenerating.get()) {
                 plugin.getLogger().info("Slot 0 Factory: Resuming generation...");
-                resumeGeneration();
             } else if (!isSlot0Ready.get()) {
                 startFactory();
             }
@@ -171,10 +120,6 @@ public class WorldFactoryManager {
             currentTask.cancel();
             currentTask = null;
         }
-    }
-
-    private void resumeGeneration() {
-        startChunkyGeneration();
     }
 
     public void startFactory() {
@@ -221,9 +166,6 @@ public class WorldFactoryManager {
         isSlot0Ready.set(false);
         
         plugin.getLogger().info("Starting Slot 0 Factory for Batch: " + currentTargetSlotId + "...");
-        
-        // Ensure Chunky is quiet
-        executeCommand("chunky quiet 1");
         
         // 3. Create and Generate worlds (with 10s delay/warning for initial batch start)
         setupSlot0Worlds(false);
@@ -348,7 +290,6 @@ public class WorldFactoryManager {
         
         plugin.getLogger().info("Slot 0 Factory: FORCE START for " + target.getFullId());
         
-        executeCommand("chunky quiet 1");
         setupSlot0Worlds(false); // Force still gets the warning/delay for safety
     }
 
@@ -655,7 +596,7 @@ public class WorldFactoryManager {
                          // Use the new instant setup (no 10s delay, no broadcast)
                          setupSlot0Worlds(true);
                          
-                         // Wait for slot0 to be ready again (Chunky generation)
+                         // Wait for slot0 to be ready again (Slot 0 generation)
                          while (!isSlot0Ready.get()) {
                              Thread.sleep(5000);
                              if (isPaused.get()) throw new Exception("Factory paused during uniqueness cycle");
@@ -813,17 +754,6 @@ public class WorldFactoryManager {
     }
 
     public void forceClone(ManhuntSlot slot, Runnable onComplete) {
-        // Stop Chunky if running
-        if (chunkyHook != null) {
-            if (currentWorldWaitingFor != null) {
-                chunkyHook.cancelTask("spycore-worlds/" + currentWorldWaitingFor);
-            }
-            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_OW_TECH);
-            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_NE_TECH);
-            chunkyHook.cancelTask("spycore-worlds/" + SLOT0_EN_TECH);
-        } else {
-            executeCommand("chunky stop");
-        }
         isGenerating.set(false);
         isSlot0Ready.set(true); // Pretend it's ready
         cloneToSlot(slot, onComplete);

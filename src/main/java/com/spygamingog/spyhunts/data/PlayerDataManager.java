@@ -62,7 +62,7 @@ public class PlayerDataManager {
 
     public void save() {
         synchronized (saveLock) {
-            multiDataManager.save("players");
+            multiDataManager.saveSafeAsync("players");
             dirty = false;
         }
     }
@@ -189,7 +189,9 @@ public class PlayerDataManager {
         
         Player p = Bukkit.getPlayer(uuid);
         if (p != null) {
-            saveInventory(uuid, p);
+            if (!Bukkit.getPluginManager().isPluginEnabled("SpyInventories")) {
+                saveInventory(uuid, p);
+            }
         }
         markDirty();
     }
@@ -243,6 +245,17 @@ public class PlayerDataManager {
         getConfig().set("players." + uuid + ".active_badge", badge);
         markDirty();
         updatePlayerTabName(uuid, getRoleFromCache(uuid));
+    }
+
+    public void setPlayerName(UUID uuid, String name) {
+        if (uuid == null || name == null) return;
+        getConfig().set("players." + uuid + ".name", name);
+        markDirty();
+    }
+
+    public String getPlayerName(UUID uuid) {
+        if (uuid == null) return null;
+        return getConfig().getString("players." + uuid + ".name", null);
     }
 
     public List<String> getAvailableBadges(UUID uuid) {

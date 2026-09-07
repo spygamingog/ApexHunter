@@ -42,7 +42,7 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
         }
 
         String sub = args[0].toLowerCase();
-        if (!p.hasPermission("manhunt.admin")) {
+        if (!p.hasPermission("spyhunts.admin") && !p.hasPermission("manhunt.admin")) {
             p.sendMessage("§cNo permission.");
             return true;
         }
@@ -117,7 +117,7 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!sender.hasPermission("manhunt.admin")) return new ArrayList<>();
+        if (!sender.hasPermission("spyhunts.admin") && !sender.hasPermission("manhunt.admin")) return new ArrayList<>();
         if (args.length == 1) {
             List<String> subs = Arrays.asList("set", "create", "delete", "list", "tp", "setup", "assign");
             List<String> completions = new ArrayList<>();

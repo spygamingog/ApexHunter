@@ -138,14 +138,6 @@ public class FreezeManager implements Listener {
         }
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player) {
-            if (isFrozen(e.getEntity().getUniqueId())) {
-                e.setCancelled(true);
-            }
-        }
-    }
 
     @EventHandler
     public void onDamageByEntity(EntityDamageByEntityEvent e) {
