@@ -1,0 +1,117 @@
+# ==========================================================
+#                  SpyHunts Configuration
+# ==========================================================
+
+# ----------------------------------------------------------
+# Main Lobby Settings
+# ----------------------------------------------------------
+# The location where players are sent when they join, leave, 
+# or finish a game. Use /lobby set to update this in-game.
+lobby_enabled: false
+main_lobby:
+  world: "world"
+  x: 0.5
+  y: 64.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+
+# ----------------------------------------------------------
+# General Game Settings
+# ----------------------------------------------------------
+# Time in seconds before a game starts after minimum players join.
+countdown_seconds: 30
+
+# Cooldown (in seconds) before a player can join another game 
+# if they quit during an active match. Default: 7200 (2 hours)
+quit_cooldown_seconds: 7200
+
+# Cooldown (in seconds) before a player can join another game
+# after a match ends normally. Default: 1800 (30 minutes)
+game_end_cooldown_seconds: 1800
+
+# Whether players should be frozen before the game starts.
+freeze_before_start: true
+freeze_duration_seconds: 120
+
+# ----------------------------------------------------------
+# World Factory (Background Worker)
+# ----------------------------------------------------------
+# The factory automatically generates fresh worlds in the background
+# so that games can start instantly without waiting for chunk generation.
+factory:
+  # Whether the factory starts automatically on server boot.
+  paused: true
+
+  # Interval (in minutes) to check if slots need pre-filling.
+  wait_minutes: 15
+
+  # Chunky Generation Settings
+  generation_radius: 100
+  generation_pattern: "spiral"
+  generation_shape: "circle"
+
+# ----------------------------------------------------------
+# Slot Management
+# ----------------------------------------------------------
+# How many "AVAILABLE" slots the factory should maintain for EACH mode.
+slot_count_per_mode: 3
+
+# Default number of slots to create when adding a new mode via command.
+default_slots_per_mode: 3
+
+# ----------------------------------------------------------
+# Compass Tracking Settings
+# ----------------------------------------------------------
+# How often (in ticks) the hunter's compass updates its target.
+compass_update_interval: 20
+
+# ----------------------------------------------------------
+# Badge & Title Settings
+# ----------------------------------------------------------
+# Pre-defined titles that can be given to players.
+available_titles:
+  - "&a[PRO]"
+  - "&b[GOD]"
+  - "&c[ELITE]"
+  - "&e[LEGEND]"
+
+# ----------------------------------------------------------
+# Scoreboard Settings
+# ----------------------------------------------------------
+scoreboards:
+  # Main Lobby Scoreboard
+  main_lobby:
+    title: "&6&lSPY HUNTS"
+    lines:
+      - "&7----------------"
+      - "&fOnline Players: &e{online}"
+      - "&fActive Games: &e{active}"
+      - "&fQueueing Games: &e{queueing}"
+      - "&7----------------"
+      - "&fIP: &aspyxhunter.minecraft.pe"
+      - "&fPort: &b7101"
+  
+  # Queue Lobby Scoreboard
+  queue_lobby:
+    title: "&a&lWAITING LOBBY"
+    lines:
+      - "&7----------------"
+      - "&fSlot: &e{slot_name}"
+      - "&fPlayers: &e{players}/{max_players}"
+      - "&fMode: &e{mode_id}"
+      - "&7----------------"
+      - "&fIP: &aspyxhunter.minecraft.pe"
+      - "&fPort: &b7101"
+
+  # Game Scoreboard
+  game:
+    title: "&c&lMANHUNT"
+    lines:
+      - "&7----------------"
+      - "&fTime Left: &e{time_left}"
+      - "&fPlayers: &e{players}/{max_players}"
+      - "&fRole: &e{role}"
+      - "&7----------------"
+      - "&fIP: &aspyxhunter.minecraft.pe"
+      - "&fPort: &b7101"

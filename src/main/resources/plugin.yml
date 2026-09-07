@@ -1,0 +1,54 @@
+name: SpyHunts
+version: 2.0.0
+main: com.spygamingog.spyhunts.SpyHuntsPlugin
+api-version: '1.21'
+depend: [SpyCore]
+softdepend: [Chunky]
+authors:
+  - SpyGamingOG
+commands:
+  manhunt:
+    description: Manhunt GUI and lobby management
+    usage: /manhunt [lobby|stop]
+    aliases: [mh]
+  lobby:
+    description: Teleport to the main manhunt lobby or set it
+    usage: /lobby [set]
+  hub:
+    description: Transfer to the external hub server
+    usage: /hub
+  leave:
+    description: Leave current manhunt queue and return to lobby
+    usage: /leave
+  rejoin:
+    description: Rejoin your active manhunt session
+    usage: /rejoin
+  quit:
+    description: Quit current manhunt and return to lobby with cooldown
+    usage: /quit
+  status:
+    description: Change slot status
+    usage: /status <slot> <available|unavailable|running>
+  compass:
+    description: Get tracking compass for manhunt
+    usage: /compass
+  speedrun:
+    description: Speedrun management commands
+    usage: /speedrun
+  practice:
+    description: Practice mode commands
+    usage: /practice
+  worker:
+    description: World factory worker management
+    usage: /worker
+  stats:
+    description: View your or another player's manhunt stats
+    usage: /stats [player]
+  badge:
+    description: Manage your titles and badges
+    usage: /badge [give|set|remove]
+    aliases: [title, badges]
+  leaderboard:
+    description: Manage leaderboard holograms
+    usage: /leaderboard <create|delete|list>
+    aliases: [lb, top]

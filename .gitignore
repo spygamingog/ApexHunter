@@ -1,0 +1,26 @@
+# Target & Build Output
+target/
+*.jar
+*.class
+
+# Backup & Logs
+bckup/
+*.log
+compile_log.txt
+
+# Internal Project & Agent Documentation (DO NOT COMMIT)
+project_brain.md
+DOCUMENTATION.md
+documentation.md
+ISSUES_AND_FLAWS.md
+issues_and_flaws.md
+
+# IDE & System Files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.DS_Store
+Thumbs.db
